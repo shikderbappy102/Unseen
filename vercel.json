@@ -1,0 +1,11 @@
+{
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm --filter \"./artifacts/unseen\" run build",
+  "outputDirectory": "artifacts/unseen/dist/public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
