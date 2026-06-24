@@ -1,0 +1,160 @@
+@layer theme, base, clerk, components, utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "Space Mono", monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 250 40% 3%;
+  --foreground: 250 10% 90%;
+  
+  --card: 250 30% 5%;
+  --card-foreground: 250 10% 90%;
+  --card-border: 250 20% 12%;
+  
+  --popover: 250 40% 4%;
+  --popover-foreground: 250 10% 90%;
+  --popover-border: 250 20% 12%;
+  
+  --primary: 270 70% 60%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 250 20% 15%;
+  --secondary-foreground: 250 10% 90%;
+  
+  --muted: 250 20% 10%;
+  --muted-foreground: 250 10% 60%;
+  
+  --accent: 250 20% 12%;
+  --accent-foreground: 250 10% 90%;
+  
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 250 20% 12%;
+  --input: 250 20% 12%;
+  --ring: 270 70% 60%;
+  
+  --radius: 0.75rem;
+}
+
+/* Light theme overrides */
+html.light {
+  --background: 250 30% 97%;
+  --foreground: 250 30% 10%;
+
+  --card: 250 20% 94%;
+  --card-foreground: 250 30% 10%;
+  --card-border: 250 15% 85%;
+
+  --popover: 250 20% 96%;
+  --popover-foreground: 250 30% 10%;
+  --popover-border: 250 15% 85%;
+
+  --primary: 270 70% 55%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 250 15% 88%;
+  --secondary-foreground: 250 30% 10%;
+
+  --muted: 250 15% 90%;
+  --muted-foreground: 250 15% 45%;
+
+  --accent: 250 15% 88%;
+  --accent-foreground: 250 30% 10%;
+
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 250 15% 85%;
+  --input: 250 15% 85%;
+  --ring: 270 70% 55%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    @apply bg-background text-foreground;
+  }
+  
+  body {
+    @apply font-sans antialiased min-h-[100dvh] selection:bg-primary/30 selection:text-primary-foreground;
+  }
+}
+
+.emotion-glow-sad { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); color: rgb(96, 165, 250); }
+.emotion-glow-angry { text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); color: rgb(248, 113, 113); }
+.emotion-glow-lonely { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); color: rgb(192, 132, 252); }
+.emotion-glow-happy { text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); color: rgb(251, 191, 36); }
+.emotion-glow-stressed { text-shadow: 0 0 10px rgba(249, 115, 22, 0.5); color: rgb(251, 146, 60); }
+.emotion-glow-grateful { text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); color: rgb(74, 222, 128); }
+
+.bg-emotion-sad { background-color: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); }
+.bg-emotion-angry { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+.bg-emotion-lonely { background-color: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.2); }
+.bg-emotion-happy { background-color: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); }
+.bg-emotion-stressed { background-color: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); }
+.bg-emotion-grateful { background-color: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); }
+
+.type-thought { border-left: 2px solid transparent; }
+.type-worst_experience { border-left: 2px solid rgba(239, 68, 68, 0.3); background: linear-gradient(to right, rgba(239, 68, 68, 0.05), transparent); }
+
+/* Hide scrollbar for clean look */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
