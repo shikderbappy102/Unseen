@@ -26,7 +26,9 @@ import Profile from "@/pages/profile";
 import MyVibe from "@/pages/my-vibe";
 import Compose from "@/pages/compose";
 
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const clerkPubKey =
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ||
+  "pk_test_ZmFuY3ktdW5pY29ybi03Ni5jbGVyay5hY2NvdW50cy5kZXYk";
 
 if (!clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
