@@ -1,0 +1,398 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: UNSEEN - Anonymous emotional sharing platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: posts
+    description: Anonymous post operations
+  - name: comments
+    description: Comment operations
+  - name: reactions
+    description: Like/reaction operations
+  - name: trending
+    description: Trending and discovery
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /posts:
+    get:
+      operationId: listPosts
+      tags: [posts]
+      summary: List posts (infinite scroll feed)
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: ["integer", "null"]
+          description: Cursor for pagination (last post ID seen)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: emotion
+          in: query
+          schema:
+            type: ["string", "null"]
+          description: Filter by emotion tag
+        - name: type
+          in: query
+          schema:
+            type: ["string", "null"]
+            enum: [thought, worst_experience, null]
+          description: Filter by post type
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostFeed"
+    post:
+      operationId: createPost
+      tags: [posts]
+      summary: Create an anonymous post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Validation error
+
+  /posts/{id}:
+    get:
+      operationId: getPost
+      tags: [posts]
+      summary: Get a single post with details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Post detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Not found
+
+  /posts/{id}/like:
+    post:
+      operationId: toggleLike
+      tags: [reactions]
+      summary: Toggle like on a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LikeInput"
+      responses:
+        "200":
+          description: Updated like count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeResult"
+
+  /posts/{id}/comments:
+    get:
+      operationId: listComments
+      tags: [comments]
+      summary: Get comments for a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      operationId: createComment
+      tags: [comments]
+      summary: Add anonymous comment to a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+
+  /posts/{id}/report:
+    post:
+      operationId: reportPost
+      tags: [posts]
+      summary: Report a post for review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportInput"
+      responses:
+        "200":
+          description: Report submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportResult"
+
+  /trending:
+    get:
+      operationId: getTrending
+      tags: [trending]
+      summary: Get trending posts (most liked, most commented)
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [today, week, all]
+            default: today
+      responses:
+        "200":
+          description: Trending posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrendingResult"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [trending]
+      summary: Get platform stats and emotion breakdown
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Post:
+      type: object
+      required: [id, content, type, likeCount, commentCount, createdAt, isLiked]
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        type:
+          type: string
+          enum: [thought, worst_experience]
+        emotion:
+          type: ["string", "null"]
+        relatedToId:
+          type: ["integer", "null"]
+        likeCount:
+          type: integer
+        commentCount:
+          type: integer
+        isLiked:
+          type: boolean
+        isReported:
+          type: boolean
+        createdAt:
+          type: string
+
+    PostFeed:
+      type: object
+      required: [posts, hasMore]
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        hasMore:
+          type: boolean
+        nextCursor:
+          type: ["integer", "null"]
+
+    PostInput:
+      type: object
+      required: [content, type]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        type:
+          type: string
+          enum: [thought, worst_experience]
+        emotion:
+          type: ["string", "null"]
+          enum: [sad, angry, lonely, happy, stressed, grateful, null]
+        relatedToId:
+          type: ["integer", "null"]
+          description: ID of the post this resonates with
+
+    Comment:
+      type: object
+      required: [id, postId, content, createdAt]
+      properties:
+        id:
+          type: integer
+        postId:
+          type: integer
+        content:
+          type: string
+        createdAt:
+          type: string
+
+    CommentInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+
+    LikeInput:
+      type: object
+      required: [sessionId]
+      properties:
+        sessionId:
+          type: string
+
+    LikeResult:
+      type: object
+      required: [likeCount, isLiked]
+      properties:
+        likeCount:
+          type: integer
+        isLiked:
+          type: boolean
+
+    ReportInput:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          enum: [spam, abusive, harmful, other]
+
+    ReportResult:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    TrendingResult:
+      type: object
+      required: [mostLiked, mostCommented, mostRelatable]
+      properties:
+        mostLiked:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        mostCommented:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        mostRelatable:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+
+    PlatformStats:
+      type: object
+      required: [totalPosts, totalLikes, totalComments, emotionBreakdown]
+      properties:
+        totalPosts:
+          type: integer
+        totalLikes:
+          type: integer
+        totalComments:
+          type: integer
+        emotionBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmotionCount"
+
+    EmotionCount:
+      type: object
+      required: [emotion, count]
+      properties:
+        emotion:
+          type: string
+        count:
+          type: integer
