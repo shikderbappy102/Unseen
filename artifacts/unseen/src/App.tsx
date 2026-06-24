@@ -32,6 +32,8 @@ if (!clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 }
 
+console.info("UNSEEN: Clerk direct publishable key mode");
+
 const basePath = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
 
 function stripBase(path: string): string {
